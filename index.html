@@ -9,10 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
     <!-- 메인 스타일시트 -->
-    <link rel="stylesheet" href="style.css?v=20000">
+    <link rel="stylesheet" href="style.css?v=40000">
 </head>
 <body>
-    <!-- [100% 완벽 온/오프 제어 레이어] 동적 DOM 빗줄기 컨테이너 -->
+    <!-- [시원한 비 파티클 레이어] 동적 DOM 빗줄기 컨테이너 -->
     <div id="rainContainer"></div>
 
     <!-- 캔버스 배경 파티클 -->
@@ -27,8 +27,8 @@
         <!-- 헤더 영역 -->
         <header class="header">
             <div class="logo-area">
-                <span class="weather-badge" id="currentWeatherBadge">🐸 ☀️ 맑음 개구리</span>
-                <h1>실시간 기상청 날씨 & 개구리 대시보드</h1>
+                <span class="weather-badge" id="currentWeatherBadge">🐸 🌧️ 소슬비 개구리</span>
+                <h1>지역별 기상 예보 & 개구리 날씨</h1>
             </div>
             <!-- 캐릭터 도감 버튼 -->
             <button id="openGalleryBtn" class="btn-gallery">
@@ -37,55 +37,54 @@
             </button>
         </header>
 
-        <!-- 실시간 지역별 기상청 날씨 API 연동 바 -->
+        <!-- 지역별 날씨 예보 선택 바 -->
         <section class="card location-time-bar">
             <div class="location-select-group">
-                <label for="realtimeLocSelect" class="loc-label">📍 기상청 연동 지역 선택:</label>
+                <label for="realtimeLocSelect" class="loc-label">📍 기상 예보 지역 선택:</label>
                 <select id="realtimeLocSelect" class="location-dropdown">
-                    <option value="seoul">서울특별시 🏙️ (비 예보 8.5mm/h - 파티클 ON)</option>
-                    <option value="jeju" selected>제주특별자치도 🌴 (맑음 0.0mm/h - 파티클 OFF)</option>
+                    <option value="seoul" selected>서울특별시 🏙️ (비 예보 8.5mm/h - 비 파티클 ON)</option>
+                    <option value="jeju">제주특별자치도 🌴 (맑음 0.0mm/h - 파티클 OFF)</option>
                     <option value="busan">부산광역시 🌊 (맑음 0.0mm/h - 파티클 OFF)</option>
                     <option value="incheon">인천광역시 ✈️ (구름 1.5mm/h - 파티클 OFF)</option>
                     <option value="gangneung">강원도 강릉 🌲 (눈 예보 5.0mm/h)</option>
-                    <option value="dokdo">독도 / 울릉도 🏝️ (폭우 22.0mm/h)</option>
-                    <option value="london">런던 🇬🇧 (실시간 비 내리는 곳 테스트)</option>
+                    <option value="dokdo">독도 / 울릉도 🏝️ (폭우 22.0mm/h - 비 파티클 ON)</option>
                 </select>
-                <!-- 실시간 날씨 불러오기 버튼 -->
+                <!-- 날씨 조회 버튼 -->
                 <button id="fetchApiBtn" class="btn-api-fetch">
-                    <span>🌐 날씨 조회하기</span>
+                    <span>🔍 날씨 조회하기</span>
                 </button>
             </div>
             <div class="api-notice">
-                <span class="api-tag" id="apiStatusTag">2.0mm 이상 비 파티클 조건 적용</span>
-                <span id="apiNoticeText">제주특별자치도: 0.0mm/h (맑음 - 비 안 내림)</span>
+                <span class="api-tag" id="apiStatusTag">2.0mm 이상 비 파티클 가동</span>
+                <span id="apiNoticeText">서울특별시: 강수량 8.5 mm/h (2.0mm 이상 -> 푸른 빗줄기 파티클 ON)</span>
             </div>
         </section>
 
         <!-- 메인 대시보드 그리드 -->
         <main class="dashboard-grid">
 
-            <!-- 왼쪽: 화이트 배경 메인 개구리 캐릭터 및 날씨 카드 -->
+            <!-- 왼쪽: 메인 우비 개구리 캐릭터 및 날씨 카드 -->
             <section class="card character-card">
                 <div class="character-wrapper">
                     <div class="character-glow" id="characterGlow"></div>
-                    <img id="mascotImage" src="assets/sunny.png" alt="귀여운 날씨 개구리 캐릭터" class="mascot-img">
+                    <img id="mascotImage" src="./drizzle.png" alt="귀여운 날씨 개구리 캐릭터" class="mascot-img">
                 </div>
 
                 <!-- 개구리 말풍선 대사 -->
                 <div class="speech-bubble" id="speechBubble">
-                    "개굴! 오늘은 햇살이 눈부셔서 멋진 선글라스를 썼어요! ☀️"
+                    "개굴! 보슬보슬 비가 와요! 연꽃잎 우산과 우비를 착용했어요! 🌧️"
                 </div>
 
                 <!-- 강수량 디스플레이 -->
                 <div class="weather-status-display">
                     <div class="status-location-info">
-                        <span id="displayLocationName">제주특별자치도 🌴</span> · <span id="displayTimeName">실시간 데이터</span>
+                        <span id="displayLocationName">서울특별시 🏙️</span> · <span id="displayTimeName">기상 예보</span>
                     </div>
                     <div class="rainfall-value-group">
-                        <span id="rainfallNumber" class="rainfall-num">0.0</span>
+                        <span id="rainfallNumber" class="rainfall-num">8.5</span>
                         <span class="unit">mm/h</span>
                     </div>
-                    <p id="statusDesc" class="status-desc">비 소식이 전혀 없는 맑은 날씨입니다. 쾌적하게 산책을 즐겨보세요!</p>
+                    <p id="statusDesc" class="status-desc">2.0mm/h 이상의 비가 내립니다. 푸른 빗줄기 파티클이 화면에 쏟아집니다.</p>
                 </div>
             </section>
 
@@ -95,18 +94,18 @@
                 <!-- 읽기 전용 강수량 예보 게이지 -->
                 <div class="card controller-card readonly-card">
                     <div class="card-header-with-badge">
-                        <h3>📊 실시간 강수량 측정 게이지</h3>
+                        <h3>📊 지역별 강수량 측정 게이지</h3>
                         <span class="readonly-badge">🔒 읽기 전용</span>
                     </div>
-                    <p class="section-sub">API 수신 데이터를 시각적으로 나타내는 측정 게이지입니다.</p>
+                    <p class="section-sub">선택한 지역의 강수 예보 수치를 시각적으로 나타내는 게이지입니다.</p>
                     
                     <div class="slider-container">
                         <div class="slider-header">
                             <span>0 mm/h (맑음)</span>
-                            <span class="highlight-rain" id="sliderDisplayValue">0.0 mm/h</span>
+                            <span class="highlight-rain" id="sliderDisplayValue">8.5 mm/h</span>
                             <span>100 mm/h (폭우)</span>
                         </div>
-                        <input type="range" id="rainfallSlider" min="0" max="100" step="0.5" value="0.0" class="rainfall-slider readonly-slider" disabled>
+                        <input type="range" id="rainfallSlider" min="0" max="100" step="0.5" value="8.5" class="rainfall-slider readonly-slider" disabled>
                     </div>
                 </div>
 
@@ -118,21 +117,21 @@
                             <span class="tip-icon" id="umbrellaIcon">🌂</span>
                             <div class="tip-content">
                                 <strong>우산 챙기기</strong>
-                                <span id="umbrellaTip">우산이 필요 없는 맑은 날씨입니다.</span>
+                                <span id="umbrellaTip">귀여운 소형 우산이나 우비를 준비하세요.</span>
                             </div>
                         </div>
                         <div class="tip-item">
                             <span class="tip-icon" id="outfitIcon">👕</span>
                             <div class="tip-content">
                                 <strong>추천 옷차림</strong>
-                                <span id="outfitTip">선글라스나 시원하고 가벼운 옷차림 추천!</span>
+                                <span id="outfitTip">젖어도 잘 마르는 방수 의류와 가벼운 신발</span>
                             </div>
                         </div>
                         <div class="tip-item">
                             <span class="tip-icon" id="activityIcon">🐸</span>
                             <div class="tip-content">
                                 <strong>개구리 기분 지수</strong>
-                                <span id="activityTip">개구리가 연못가에서 일광욕하기 최고입니다 (100점)</span>
+                                <span id="activityTip">개구리가 제일 좋아하는 비 오는 날 촉촉한 산책! (90점)</span>
                             </div>
                         </div>
                     </div>
@@ -153,7 +152,7 @@
 
             <div class="gallery-grid">
                 <div class="gallery-card">
-                    <div class="gallery-img-box"><img src="assets/sunny.png" alt="맑은 날 개구리"></div>
+                    <div class="gallery-img-box"><img src="./sunny.png" alt="맑은 날 개구리"></div>
                     <div class="gallery-info">
                         <div class="gallery-title"><span class="weather-icon">☀️</span><strong>맑음 개구리 (0mm/h)</strong></div>
                         <p class="gallery-desc">햇빛이 반짝이는 날! 힙한 선글라스를 끼고 햇살을 즐기는 귀여운 개구리입니다.</p>
@@ -161,7 +160,7 @@
                     </div>
                 </div>
                 <div class="gallery-card">
-                    <div class="gallery-img-box"><img src="assets/cloudy.png" alt="흐린 날 개구리"></div>
+                    <div class="gallery-img-box"><img src="./cloudy.png" alt="흐린 날 개구리"></div>
                     <div class="gallery-info">
                         <div class="gallery-title"><span class="weather-icon">☁️</span><strong>흐림 개구리 (0.1 ~ 2.0mm/h)</strong></div>
                         <p class="gallery-desc">구름이 폭신한 날! 몽실몽실 구름 모자를 머리에 올려놓고 편안히 휴식합니다.</p>
@@ -169,7 +168,7 @@
                     </div>
                 </div>
                 <div class="gallery-card">
-                    <div class="gallery-img-box"><img src="assets/drizzle.png" alt="약한 비 개구리"></div>
+                    <div class="gallery-img-box"><img src="./drizzle.png" alt="약한 비 개구리"></div>
                     <div class="gallery-info">
                         <div class="gallery-title"><span class="weather-icon">🌧️</span><strong>소슬비 개구리 (2.0 ~ 15.0mm/h)</strong></div>
                         <p class="gallery-desc">보슬비가 내리는 날! 연꽃잎 우산과 노란 우비 장화로 단장한 개구리입니다.</p>
@@ -177,7 +176,7 @@
                     </div>
                 </div>
                 <div class="gallery-card">
-                    <div class="gallery-img-box"><img src="assets/heavy_rain.png" alt="폭우 개구리"></div>
+                    <div class="gallery-img-box"><img src="./heavy_rain.png" alt="폭우 개구리"></div>
                     <div class="gallery-info">
                         <div class="gallery-title"><span class="weather-icon">⛈️</span><strong>폭우 개구리 (15.0mm/h 이상)</strong></div>
                         <p class="gallery-desc">장대비가 쏟아지는 날! 노란 우비를 입고 커다란 우산을 꼭 잡고 당당하게 빗속을 거닙니다.</p>
@@ -185,7 +184,7 @@
                     </div>
                 </div>
                 <div class="gallery-card">
-                    <div class="gallery-img-box"><img src="assets/snow.png" alt="폭설 개구리"></div>
+                    <div class="gallery-img-box"><img src="./snow.png" alt="폭설 개구리"></div>
                     <div class="gallery-info">
                         <div class="gallery-title"><span class="weather-icon">❄️</span><strong>겨울눈 개구리 (Snow Mode)</strong></div>
                         <p class="gallery-desc">함박눈 내리는 겨울! 따뜻한 빨간 목도리와 털모자를 두르고 꼬마 눈사람을 만듭니다.</p>
@@ -197,7 +196,7 @@
     </div>
 
     <!-- 스크립트 연결 -->
-    <script src="weather_api.js?v=20000"></script>
-    <script src="app.js?v=20000"></script>
+    <script src="weather_api.js?v=40000"></script>
+    <script src="app.js?v=40000"></script>
 </body>
 </html>

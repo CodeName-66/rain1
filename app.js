@@ -2,12 +2,11 @@
  * ==========================================================================
  * 귀여운 개구리 날씨 대시보드 메인 스크립트 (app.js)
  * --------------------------------------------------------------------------
- * 1. 2.0 mm/h 이상인 지역 (서울 8.5mm, 독도 22mm) -> 시원한 푸른 빗줄기 파티클 가동!
- * 2. 2.0 mm/h 미만인 지역 (제주 0.0mm, 부산 0.0mm) -> 비 파티클 완전 차단 (OFF)
+ * 이미지 경로 최상위 루트 경로(./sunny.png) 완벽 통합 버전
  * ==========================================================================
  */
 
-console.log('[WeatherApp] app.js v30000 2.0mm 이상 비 파티클 완벽 구동판 로딩');
+console.log('[WeatherApp] app.js 최상위 루트 경로 개구리 이미지 통합 완료');
 
 // 1. DOM 요소 참조
 const canvas = document.getElementById('weatherCanvas');
@@ -37,15 +36,15 @@ const openGalleryBtn = document.getElementById('openGalleryBtn');
 const closeGalleryBtn = document.getElementById('closeGalleryBtn');
 const galleryModal = document.getElementById('galleryModal');
 
-// 2. 날씨 상태별 귀여운 개구리 데이터
+// 2. 날씨 상태별 귀여운 개구리 데이터 (최상위 루트 이미지 경로 ./파일명.png 적용)
 const WEATHER_CONFIGS = {
     sunny: {
         badge: '🐸 ☀️ 맑음 개구리',
         title: '햇살 가득한 맑은 날',
-        image: 'assets/sunny.png',
+        image: './sunny.png',
         glow: 'rgba(245, 158, 11, 0.25)',
         speech: '"개굴! 오늘은 햇살이 눈부셔서 멋진 선글라스를 썼어요! ☀️"',
-        desc: '비 소식이 전혀 없는 맑은 날씨입니다. 쾌적하게 산책을 즐겨보세요!',
+        desc: '비 소식이 전혀 없는 맑은 날씨입니다. (비 파티클 없음)',
         umbrella: '우산이 필요 없는 맑은 날씨입니다.',
         outfit: '선글라스나 시원하고 가벼운 옷차림 추천!',
         activity: '개구리가 연못가에서 일광욕하기 최고입니다 (100점)'
@@ -53,10 +52,10 @@ const WEATHER_CONFIGS = {
     cloudy: {
         badge: '🐸 ☁️ 흐림 개구리',
         title: '구름 많은 흐린 날',
-        image: 'assets/cloudy.png',
+        image: './cloudy.png',
         glow: 'rgba(100, 116, 139, 0.2)',
         speech: '"개굴~ 하늘에 구름 모자가 생겼어요! 차분해서 휴식하기 좋아요. ☁️"',
-        desc: '2.0mm 미만의 비 파티클이 없는 잔잔한 흐림 날씨입니다.',
+        desc: '2.0mm 미만의 비 파티클이 발생하지 않는 구름 날씨입니다.',
         umbrella: '혹시 모를 소나기에 대비해 접이우산을 챙겨두세요.',
         outfit: '가벼운 가디건이나 편안한 옷차림',
         activity: '가벼운 산책이나 휴식을 즐기기 좋습니다 (75점)'
@@ -64,10 +63,10 @@ const WEATHER_CONFIGS = {
     drizzle: {
         badge: '🐸 🌧️ 소슬비 개구리',
         title: '보슬보슬 비 내리는 날',
-        image: 'assets/drizzle.png',
+        image: './drizzle.png',
         glow: 'rgba(2, 132, 199, 0.25)',
         speech: '"개굴! 보슬보슬 비가 와요! 연꽃잎 우산과 우비를 착용했어요! 🌧️"',
-        desc: '2.0mm/h 이상의 비가 내립니다. 푸른 빗줄기 파티클이 화면 전체에 떨어집니다.',
+        desc: '2.0mm/h 이상의 비가 내립니다. 시원한 푸른 빗줄기 파티클이 쏟아집니다.',
         umbrella: '귀여운 소형 우산이나 우비를 준비하세요.',
         outfit: '젖어도 잘 마르는 방수 의류와 가벼운 신발',
         activity: '개구리가 제일 좋아하는 비 오는 날 촉촉한 산책! (90점)'
@@ -75,10 +74,10 @@ const WEATHER_CONFIGS = {
     heavy_rain: {
         badge: '🐸 ⛈️ 폭우 개구리',
         title: '세찬 비바람이 불어오는 폭우',
-        image: 'assets/heavy_rain.png',
+        image: './heavy_rain.png',
         glow: 'rgba(79, 70, 229, 0.3)',
         speech: '"개굴!! 장대비가 거세게 쏟아져요! 큰 우산과 우비를 꼭 챙기세요! ⛈️"',
-        desc: '15.0mm/h 이상의 세찬 폭우가 쏟아집니다! 거센 빗줄기 파티클이 발생합니다.',
+        desc: '15.0mm/h 이상의 세찬 폭우가 쏟아집니다. 거센 빗줄기 파티클이 발생합니다.',
         umbrella: '튼튼한 장우산과 우비, 방수 레인부츠 필수!',
         outfit: '완전 방수 재킷과 단단한 신발',
         activity: '야외 이동을 자제하고 실내에 머무르세요 (20점)'
@@ -86,7 +85,7 @@ const WEATHER_CONFIGS = {
     snow: {
         badge: '🐸 ❄️ 겨울눈 개구리',
         title: '하얀 눈송이가 내리는 겨울날',
-        image: 'assets/snow.png',
+        image: './snow.png',
         glow: 'rgba(56, 189, 248, 0.25)',
         speech: '"개굴! 뽀득뽀득 하얀 눈이 내려요! 빨간 목도리를 두르고 눈사람을 만들었어요! ❄️"',
         desc: '함박눈이 내리고 있습니다. 빙판길 미끄럼에 주의하세요.',
@@ -97,36 +96,33 @@ const WEATHER_CONFIGS = {
 };
 
 // 3. 실시간 앱 상태
-let currentRainfall = 0.0;
-let currentStatusKey = 'sunny';
-let currentParticleType = 'sun';
+let currentRainfall = 8.5;
+let currentStatusKey = 'drizzle';
+let currentParticleType = 'rain';
 
 // ==========================================================================
-// 4. [2.0mm 이상 비 파티클 100% 가동 / 2.0mm 미만 완전 차단]
+// 4. [2.0mm 이상 비 파티클 무조건 발생 / 2.0mm 미만 무조건 차단]
 // ==========================================================================
-function renderDOMRainDrops(rainValue, statusKey) {
+function updateRainParticles(rainValue, statusKey) {
     if (!rainContainer) return;
 
-    // 강수량이 2.0 mm/h 미만이거나 맑음/흐림/눈이면 비 파티클 완전 삭제(OFF)
     if (rainValue < 2.0 || statusKey === 'sunny' || statusKey === 'cloudy' || statusKey === 'snow') {
-        rainContainer.classList.remove('active-rain');
+        rainContainer.innerHTML = '';
         rainContainer.style.display = 'none';
-        rainContainer.innerHTML = ''; // 자식 요소 완전 삭제
-        console.log(`[WeatherApp] ☀️ 강수량 ${rainValue}mm/h (< 2.0mm) - 비 파티클 완전 OFF`);
+        console.log(`[WeatherApp] ☀️ 강수량 ${rainValue}mm/h (< 2.0mm) -> 비 파티클 완전 차단 (OFF)`);
     } else {
-        // 강수량이 2.0 mm/h 이상이고 비 상태일 때는 푸른 빗줄기 파티클 100% 생성(ON)
         rainContainer.innerHTML = '';
         const isHeavy = statusKey === 'heavy_rain';
-        let dropCount = Math.floor(rainValue * 2.5) + 40;
+        let dropCount = Math.floor(rainValue * 3.0) + 50;
 
         for (let i = 0; i < dropCount; i++) {
             const drop = document.createElement('div');
             drop.className = isHeavy ? 'heavy-rain-drop' : 'rain-drop';
 
             const left = Math.random() * 100;
-            const duration = isHeavy ? (Math.random() * 0.4 + 0.3) : (Math.random() * 0.6 + 0.45);
+            const duration = isHeavy ? (Math.random() * 0.4 + 0.3) : (Math.random() * 0.5 + 0.4);
             const delay = Math.random() * 1.5;
-            const height = isHeavy ? (Math.random() * 25 + 35) : (Math.random() * 18 + 24);
+            const height = isHeavy ? (Math.random() * 25 + 38) : (Math.random() * 20 + 26);
 
             drop.style.left = `${left}vw`;
             drop.style.height = `${height}px`;
@@ -136,9 +132,8 @@ function renderDOMRainDrops(rainValue, statusKey) {
             rainContainer.appendChild(drop);
         }
 
-        rainContainer.classList.add('active-rain');
         rainContainer.style.display = 'block';
-        console.log(`[WeatherApp] ☔ 강수량 ${rainValue}mm/h (>= 2.0mm) - 빗줄기 ${dropCount}개 100% 가동 (ON)`);
+        console.log(`[WeatherApp] ☔ 강수량 ${rainValue}mm/h (>= 2.0mm) -> 시원한 빗줄기 ${dropCount}개 가동 (ON)`);
     }
 }
 
@@ -169,8 +164,8 @@ class Particle {
 
         if (type === 'rain' || type === 'heavy_rain') {
             const intensity = Math.max(currentRainfall, 1.0) / 100;
-            this.length = Math.random() * 25 + 20 + (type === 'heavy_rain' ? 20 : 0);
-            this.speed = Math.random() * 10 + 14 + intensity * 20;
+            this.length = Math.random() * 25 + 22 + (type === 'heavy_rain' ? 20 : 0);
+            this.speed = Math.random() * 10 + 15 + intensity * 20;
             this.opacity = Math.random() * 0.4 + 0.6;
             this.wind = (Math.random() - 0.5) * 3 + (type === 'heavy_rain' ? -4 : -1);
         } else if (type === 'snow') {
@@ -224,7 +219,7 @@ class Particle {
         ctx.beginPath();
         if (this.type === 'rain' || this.type === 'heavy_rain') {
             ctx.strokeStyle = this.type === 'heavy_rain' ? `rgba(30, 58, 138, ${this.opacity})` : `rgba(2, 132, 199, ${this.opacity})`;
-            ctx.lineWidth = this.type === 'heavy_rain' ? 2.8 : 2.0;
+            ctx.lineWidth = this.type === 'heavy_rain' ? 3.0 : 2.2;
             ctx.moveTo(this.x, this.y);
             ctx.lineTo(this.x + this.wind * 2, this.y + this.length);
             ctx.stroke();
@@ -249,9 +244,9 @@ function initParticles() {
     let count = 40;
 
     if (currentParticleType === 'rain') {
-        count = Math.floor(currentRainfall * 8) + 60;
+        count = Math.floor(currentRainfall * 8) + 70;
     } else if (currentParticleType === 'heavy_rain') {
-        count = Math.floor(currentRainfall * 10) + 100;
+        count = Math.floor(currentRainfall * 10) + 110;
     } else if (currentParticleType === 'snow') {
         count = 80;
     } else if (currentParticleType === 'sun') {
@@ -279,7 +274,6 @@ function renderCanvas() {
         flashOpacity -= 0.02;
     }
 
-    // 2.0mm 이상일 때만 Canvas 비 파티클 렌더링
     if (currentParticleType === 'rain' || currentParticleType === 'heavy_rain') {
         if (currentRainfall >= 2.0) {
             particles.forEach(p => {
@@ -296,9 +290,6 @@ function renderCanvas() {
 
     requestAnimationFrame(renderCanvas);
 }
-
-initParticles();
-renderCanvas();
 
 // 6. 메인 상태 및 캐릭터 변경 핵심 함수
 function updateWeatherState(rainValue, forcedStatusKey = null, customLocationName = null) {
@@ -317,7 +308,6 @@ function updateWeatherState(rainValue, forcedStatusKey = null, customLocationNam
         currentStatusKey = 'heavy_rain';
     }
 
-    // 파티클 타입 지정
     if (currentStatusKey === 'heavy_rain') currentParticleType = 'heavy_rain';
     else if (currentStatusKey === 'drizzle') currentParticleType = 'rain';
     else if (currentStatusKey === 'cloudy') currentParticleType = 'cloud';
@@ -326,7 +316,6 @@ function updateWeatherState(rainValue, forcedStatusKey = null, customLocationNam
 
     const config = WEATHER_CONFIGS[currentStatusKey];
 
-    // UI 텍스트 수치 변경
     rainfallNumber.textContent = currentRainfall.toFixed(1);
     sliderDisplayValue.textContent = `${currentRainfall.toFixed(1)} mm/h`;
     rainfallSlider.value = currentRainfall;
@@ -338,7 +327,6 @@ function updateWeatherState(rainValue, forcedStatusKey = null, customLocationNam
         displayLocationName.textContent = customLocationName;
     }
 
-    // 개구리 캐릭터 변경
     mascotImage.src = config.image;
     speechBubble.textContent = config.speech;
     characterGlow.style.background = config.glow;
@@ -347,12 +335,19 @@ function updateWeatherState(rainValue, forcedStatusKey = null, customLocationNam
     outfitTip.textContent = config.outfit;
     activityTip.textContent = config.activity;
 
-    // 2.0mm 이상 비 파티클 가동 및 캐릭터 동기화
-    renderDOMRainDrops(currentRainfall, currentStatusKey);
+    updateRainParticles(currentRainfall, currentStatusKey);
     initParticles();
 }
 
-// 7. 실시간 API 연동 이벤트
+// 7. 글로벌 수신 함수
+window.setWeatherData = function(data) {
+    if (typeof data.rain !== 'undefined') {
+        const rainValue = parseFloat(data.rain);
+        updateWeatherState(rainValue, data.status || null, data.locationName || null);
+    }
+};
+
+// 8. 드롭다운 및 버튼 이벤트
 if (fetchApiBtn) {
     fetchApiBtn.addEventListener('click', () => {
         const cityKey = realtimeLocSelect.value;
@@ -384,17 +379,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// 외부 API 수신 전용 함수
-window.setWeatherData = function(data) {
-    if (typeof data.rain !== 'undefined') {
-        const rainValue = parseFloat(data.rain);
-        updateWeatherState(rainValue, data.status || null, data.locationName || null);
-    }
-};
-
-// 8. 초기 실행 (선택된 드롭다운 값 수신)
-if (realtimeLocSelect && typeof fetchRealtimeWeather === 'function') {
-    fetchRealtimeWeather(realtimeLocSelect.value);
-} else {
-    updateWeatherState(0.0, 'sunny', '제주특별자치도 🌴');
-}
+// 9. 초기 구동 (서울특별시 8.5mm 기본 실행)
+updateWeatherState(8.5, 'drizzle', '서울특별시 🏙️');
+initParticles();
+renderCanvas();
