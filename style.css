@@ -1,0 +1,673 @@
+/* ==========================================================================
+   강수량 예보 & 귀여운 개구리 날씨 앱 화이트 테마 CSS (style.css)
+   ========================================================================== */
+
+/* 1. 디자인 시스템 변수 - 화이트 모드 */
+:root {
+    --bg-main: #f8fafc;
+    --card-bg: #ffffff;
+    --card-border: rgba(226, 232, 240, 0.8);
+    --card-shadow: 0 10px 30px rgba(148, 163, 184, 0.15);
+    
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    
+    --accent-sunny: #f59e0b;
+    --accent-cloudy: #64748b;
+    --accent-rain: #0284c7;
+    --accent-heavy-rain: #2563eb;
+    --accent-snow: #38bdf8;
+
+    --frog-green: #22c55e;
+    --frog-green-light: #dcfce7;
+
+    --radius-lg: 24px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+
+    --font-family: 'Noto Sans KR', 'Outfit', sans-serif;
+}
+
+/* 2. 기본 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-family);
+}
+
+body {
+    background: #f1f5f9;
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ==========================================================================
+   3. [100% 철저한 숨김 및 비 발생 시만 가동] DOM 비 파티클 레이어 (#rainContainer)
+   ========================================================================== */
+#rainContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99999;
+    pointer-events: none;
+    overflow: hidden;
+    display: none !important; /* 기본적으로 절대 출력 안 됨 */
+    opacity: 0;
+    visibility: hidden;
+}
+
+#rainContainer.active-rain {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* 선명하고 가늘고 예쁜 푸른 빗줄기 */
+.rain-drop {
+    position: absolute;
+    top: -50px;
+    background: linear-gradient(180deg, rgba(2, 132, 199, 0) 0%, rgba(2, 132, 199, 1) 100%);
+    width: 2.8px;
+    border-radius: 2px;
+    box-shadow: 0 0 6px rgba(2, 132, 199, 0.8);
+    animation: rainFall linear infinite;
+    pointer-events: none;
+}
+
+.heavy-rain-drop {
+    position: absolute;
+    top: -60px;
+    background: linear-gradient(180deg, rgba(30, 58, 138, 0) 0%, rgba(30, 58, 138, 1) 100%);
+    width: 3.8px;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(30, 58, 138, 0.9);
+    animation: heavyRainFall linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rainFall {
+    0% {
+        transform: translateY(0vh) rotate(-8deg);
+        opacity: 0.2;
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(115vh) rotate(-8deg);
+        opacity: 0.2;
+    }
+}
+
+@keyframes heavyRainFall {
+    0% {
+        transform: translateY(0vh) rotate(-12deg);
+        opacity: 0.3;
+    }
+    30% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(115vh) rotate(-12deg);
+        opacity: 0.3;
+    }
+}
+
+/* 캔버스 파티클 배경 */
+#weatherCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99998;
+    pointer-events: none;
+}
+
+/* 상단 후광 레이어 */
+.overlay-glow {
+    position: fixed;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    height: 50vh;
+    background: radial-gradient(circle, rgba(220, 252, 231, 0.6) 0%, rgba(241, 245, 249, 0) 70%);
+    z-index: 2;
+    pointer-events: none;
+    transition: background 0.8s ease;
+}
+
+/* 4. 메인 컨테이너 */
+.app-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* 5. 헤더 스타일 - 화이트 */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--card-shadow);
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo-area h1 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.weather-badge {
+    background: var(--frog-green-light);
+    border: 1px solid var(--frog-green);
+    color: #15803d;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+/* 캐릭터 도감 버튼 */
+.btn-gallery {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #ffffff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+    transition: transform 0.2s ease;
+}
+
+.btn-gallery:hover {
+    transform: translateY(-2px);
+}
+
+/* 6. 실시간 날씨 API 연동 바 스타일 */
+.location-time-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 28px;
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--card-shadow);
+}
+
+.location-select-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.loc-label {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.location-dropdown {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 0.92rem;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+}
+
+.btn-api-fetch {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+    transition: transform 0.2s ease;
+}
+
+.btn-api-fetch:hover {
+    transform: translateY(-2px);
+}
+
+.api-notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+
+.api-tag {
+    background: #e0f2fe;
+    color: #0284c7;
+    border: 1px solid #bae6fd;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.75rem;
+}
+
+/* 7. 메인 대시보드 그리드 */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 24px;
+}
+
+.card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--card-shadow);
+}
+
+/* 8. 캐릭터 카드 */
+.character-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    background: #ffffff;
+}
+
+.character-wrapper {
+    position: relative;
+    width: 260px;
+    height: 260px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border-radius: 50%;
+}
+
+.character-glow {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(34, 197, 94, 0.15);
+    filter: blur(30px);
+    z-index: 1;
+}
+
+.mascot-img {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.08));
+    transition: transform 0.3s ease;
+}
+
+.mascot-img:hover {
+    transform: scale(1.06) rotate(3deg);
+}
+
+.speech-bubble {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+    padding: 14px 24px;
+    border-radius: 20px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    position: relative;
+    animation: floatBubble 3s infinite ease-in-out;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent #f8fafc transparent;
+}
+
+@keyframes floatBubble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.weather-status-display {
+    width: 100%;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.status-location-info {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #0284c7;
+    margin-bottom: 4px;
+}
+
+.rainfall-value-group {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.rainfall-num {
+    font-family: 'Outfit', sans-serif;
+    font-size: 3.6rem;
+    font-weight: 800;
+    color: var(--accent-rain);
+    line-height: 1;
+}
+
+.rainfall-value-group .unit {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.status-desc {
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.5;
+}
+
+.control-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.control-panel h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.card-header-with-badge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.readonly-badge {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #cbd5e1;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.section-sub {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+}
+
+.slider-container {
+    margin-bottom: 24px;
+}
+
+.slider-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.highlight-rain {
+    font-weight: 800;
+    font-size: 1.15rem;
+    color: var(--accent-rain);
+}
+
+.rainfall-slider.readonly-slider {
+    width: 100%;
+    height: 12px;
+    border-radius: 6px;
+    background: #e2e8f0;
+    outline: none;
+    accent-color: var(--accent-rain);
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.85;
+}
+
+.tips-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tip-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+}
+
+.tip-icon {
+    font-size: 1.9rem;
+}
+
+.tip-content strong {
+    display: block;
+    font-size: 0.92rem;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+
+.tip-content span {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* 도감 모달 */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 1;
+    visibility: visible;
+    transition: all 0.3s ease;
+}
+
+.modal-backdrop.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.modal-content {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 920px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 32px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.modal-header h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.close-btn {
+    background: #f1f5f9;
+    border: none;
+    color: #0f172a;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.close-btn:hover {
+    background: #e2e8f0;
+}
+
+.modal-sub {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.gallery-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.gallery-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--frog-green);
+}
+
+.gallery-img-box {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    background: #ffffff;
+}
+
+.gallery-img-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 6px 12px rgba(0,0,0,0.08));
+}
+
+.gallery-info {
+    padding: 16px;
+    background: #f8fafc;
+}
+
+.gallery-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.gallery-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+.gallery-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+.sunny-tag { background: #fef3c7; color: #b45309; }
+.cloudy-tag { background: #e2e8f0; color: #475569; }
+.drizzle-tag { background: #e0f2fe; color: #0369a1; }
+.heavy-rain-tag { background: #e0e7ff; color: #4338ca; }
+.snow-tag { background: #f0f9ff; color: #0284c7; }
+
+/* 반응형 */
+@media (max-width: 868px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .character-wrapper {
+        width: 200px;
+        height: 200px;
+    }
+}
